@@ -14,6 +14,29 @@ module.exports = {
     // 约定，默认的打包入口路径是 src\index.js
     plugins: [
         htmlPlugin
-    ]
-        
+    ],
+    module: { // 所有第三方 模块的配置规则
+        rules: [ // 第三方匹配规则
+           { test: /\.js|jsx$/, use: 'babel-loader', exclude: /node_modules/ },
+           { 
+               test: /\.css$/,
+                use: [
+                    {loader: 'style-loader'}, 
+                    {loader: 'css-loader',
+                    options:{
+                        modules: {
+                            localIdentName: '[path][name]-[local]'
+                        }
+                    }
+                }]
+            },
+            {test : /\.ttf|woff|woff2|eot|svg$/, use : 'url-loader'}
+        ]    
+    },
+    resolve: {
+        extensions: ['.js', '.jsx', '.json'],
+        alias: {
+            '@': path.join(__dirname, './src') // 这样，@ 就表示项目根目录中的 src 这一层目录
+        }
+    }    
 }
