@@ -10,7 +10,61 @@ import java.util.*;
  */
 public class HashMap7<K, V> extends AbstractMap<K, V> {
 
-    Entry<K, V>[] table;
+    /**
+     * 初始化容量, 必须是 2 的 次幂
+     */
+    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;
+    /**
+     * 最大容量, 2的30次方
+     */
+    static final int MAXIMUM_CAPACITY = 1 << 30;
+    /**
+     * 无参构造函数中指定的负载系数
+     */
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+    static final Entry<?, ?>[] EMPTY_TABLE = {};
+
+    Entry<K, V>[] table = (Entry<K, V>[]) EMPTY_TABLE;
+
+    /**
+     * 表示扩容的临界阀值
+     */
+    int threshold;
+    float loadFactor;
+    /**
+     * 保存的键值对数量
+     */
+    int size;
+
+    public HashMap7(int initialCapacity, float loadFactor) {
+        if (initialCapacity > MAXIMUM_CAPACITY)
+            initialCapacity = MAXIMUM_CAPACITY;
+
+        this.loadFactor = loadFactor;
+        threshold = initialCapacity;
+    }
+
+    public HashMap7(int initialCapacity) {
+        this(initialCapacity, DEFAULT_LOAD_FACTOR);
+    }
+
+    public HashMap7() {
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
+    }
+
+    public HashMap7(Map<? extends K, ? extends V> m) {
+        this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
+                DEFAULT_INITIAL_CAPACITY), DEFAULT_LOAD_FACTOR);
+        // inflateTable(threshold);
+
+        // putAllForCreate(m);
+    }
+
+    @Override
+    public V put(K key, V value) {
+        return super.put(key, value);
+    }
 
     public static class Entry<K, V> implements Map.Entry<K, V> {
         K key;
