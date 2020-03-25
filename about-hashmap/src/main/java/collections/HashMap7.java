@@ -155,8 +155,11 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
     }
 
     private void addEntry(K key, V value, int bucketIndex) {
-        if (size >= threshold && table.length <= MAXIMUM_CAPACITY) {
-            resize();
+//        if (size >= threshold && table.length <= MAXIMUM_CAPACITY) {
+//            resize();
+//        }
+        if (size >= threshold && null != table[bucketIndex]) {
+
         }
 
         createEntry(key, value, bucketIndex);
