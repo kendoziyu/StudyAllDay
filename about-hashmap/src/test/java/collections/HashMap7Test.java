@@ -29,4 +29,16 @@ public class HashMap7Test {
         }
 
     }
+
+    @Test
+    public void initByHashMap() {
+        HashMap<String, String> table = new HashMap<>();
+        table.put("hello", "world");
+        table.put("great", "future");
+
+        HashMap7<String, String> hashMap7 = new HashMap7<>(table);
+
+        Assert.assertEquals(hashMap7.get("hello"), "world");
+        Assert.assertEquals(hashMap7.get("great"), "future");
+    }
 }

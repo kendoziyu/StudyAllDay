@@ -58,7 +58,7 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
                 DEFAULT_INITIAL_CAPACITY), DEFAULT_LOAD_FACTOR);
         inflateTable(threshold);
 
-        // putAllForCreate(m);
+        putAllForCreate(m);
     }
 
     private void inflateTable(int toSize) {
@@ -67,16 +67,61 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
         table = new Entry[capacity];
     }
 
+    private void putAllForCreate(Map<? extends K, ? extends V> m) {
+        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+//            K key = entry.getKey();
+//            V value = entry.getValue();
+//            int hash = hash(key);
+//            int index = indexFor(hash, table.length);
+//
+//            Entry<K, V> bucket = table[index];
+//            table[index] = new Entry<>(key, value, bucket);
+            putForCreate(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void putForCreate(K key, V value) {
+        int hash = key == null ? 0 : hash(key);
+        int i = indexFor(hash, table.length);
+
+        for (Entry<K, V> e = table[i]; e != null; e = e.next) {
+//            if ((e.key == null && key == null) ||
+//                    (e.key != null && e.key.equals(key))) {
+            Object k;
+            if ((k = e.key) == key && (key != null && key.equals(k))) {
+                e.value = value;
+                // break;
+                return;
+            }
+        }
+
+        createEntry(key, value, i);
+    }
+
+    private void createEntry(K key, V value, int index) {
+        Entry<K, V> e = table[index];
+        table[index] = new Entry<>(key, value, e);
+        size++;
+    }
+
+    private int hash(Object key) {
+//        int hashCode = k.hashCode();
+//        return hashCode >> 16 ^ hashCode;
+        int h;
+        return key == null ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
+
+    private int indexFor(int hash, int length) {
+        // return hash % length;
+        // length must be a non-zero power of 2
+        return hash & (length - 1);
+    }
+
     /**
      * 向上取整至 2 的 n 次幂
      * 需要注意的临界值有最大容量，和负数
-     * Integer.highestOneBit(MAXIMUM_CAPACITY)=MAXIMUM_CAPACITY
-     * Integer.highestOneBit(-1)=-2147483648
-     * 还有 2^n 传入后会超出我们期望的，所以我们用 number-1 求取仅保留2进制最高位的数值
-     * Integer.highestOneBit(2^n) << 1 =2^(n+1)
      *
-     *
-     * @param number
+     * @param number 待向上取整的数
      * @return
      */
     private int roundUpToPowerOf2(int number) {
@@ -95,6 +140,12 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
         K key;
         V value;
         Entry<K, V> next;
+
+        public Entry(K key, V value, Entry<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
 
         public K getKey() {
             return key;

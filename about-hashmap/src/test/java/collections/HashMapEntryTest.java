@@ -13,12 +13,12 @@ public class HashMapEntryTest {
 
     @Test
     public void testEquals() {
-        HashMap7.Entry<String, String> e1 = new HashMap7.Entry<>();
+        HashMap7.Entry<String, String> e1 = new HashMap7.Entry<>(null ,null, null);
         String oldValue = e1.setValue("hello");
         Assert.assertNull(oldValue);
         Assert.assertEquals("hello", e1.getValue());
 
-        HashMap7.Entry<String, String> e2 = new HashMap7.Entry<>();
+        HashMap7.Entry<String, String> e2 = new HashMap7.Entry<>(null, null, null);
         e2.setValue("hello2");
         Assert.assertNotEquals(e2, e1);
 
