@@ -56,11 +56,41 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
     public HashMap7(Map<? extends K, ? extends V> m) {
         this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
                 DEFAULT_INITIAL_CAPACITY), DEFAULT_LOAD_FACTOR);
-        // inflateTable(threshold);
+        inflateTable(threshold);
 
         // putAllForCreate(m);
     }
 
+    private void inflateTable(int toSize) {
+        int capacity = roundUpToPowerOf2(toSize);
+        threshold = (int) (capacity * loadFactor);
+        table = new Entry[capacity];
+    }
+
+    /**
+     * 向上取整至 2 的 n 次幂
+     * 需要注意的临界值有最大容量，和负数
+     * Integer.highestOneBit(MAXIMUM_CAPACITY)=MAXIMUM_CAPACITY
+     * Integer.highestOneBit(-1)=-2147483648
+     * 还有 2^n 传入后会超出我们期望的，所以我们用 number-1 求取仅保留2进制最高位的数值
+     * Integer.highestOneBit(2^n) << 1 =2^(n+1)
+     *
+     *
+     * @param number
+     * @return
+     */
+    private int roundUpToPowerOf2(int number) {
+        return number >= MAXIMUM_CAPACITY ?
+                MAXIMUM_CAPACITY :
+                number >= 1 ? Integer.highestOneBit(number - 1) << 1 : 1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Integer.highestOneBit(MAXIMUM_CAPACITY - 1));
+        System.out.println(Integer.highestOneBit(MAXIMUM_CAPACITY + 100));
+        System.out.println(Integer.highestOneBit(0));
+        System.out.println(Integer.highestOneBit(-1));
+    }
     @Override
     public V put(K key, V value) {
         return super.put(key, value);
