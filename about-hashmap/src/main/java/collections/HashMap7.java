@@ -85,12 +85,7 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
                 number >= 1 ? Integer.highestOneBit(number - 1) << 1 : 1;
     }
 
-    public static void main(String[] args) {
-        System.out.println(Integer.highestOneBit(MAXIMUM_CAPACITY - 1));
-        System.out.println(Integer.highestOneBit(MAXIMUM_CAPACITY + 100));
-        System.out.println(Integer.highestOneBit(0));
-        System.out.println(Integer.highestOneBit(-1));
-    }
+
     @Override
     public V put(K key, V value) {
         return super.put(key, value);
