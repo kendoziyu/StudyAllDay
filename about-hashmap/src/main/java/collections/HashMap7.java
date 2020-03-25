@@ -98,9 +98,9 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
         createEntry(key, value, i);
     }
 
-    private void createEntry(K key, V value, int index) {
-        Entry<K, V> e = table[index];
-        table[index] = new Entry<>(key, value, e);
+    private void createEntry(K key, V value, int bucketIndex) {
+        Entry<K, V> e = table[bucketIndex];
+        table[bucketIndex] = new Entry<>(key, value, e);
         size++;
     }
 
@@ -133,7 +133,53 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V put(K key, V value) {
-        return super.put(key, value);
+        if (EMPTY_TABLE == table) {
+            inflateTable(DEFAULT_INITIAL_CAPACITY);
+        }
+
+        int hash = key == null ? 0 : hash(key);
+        int i = indexFor(hash, table.length);
+        for (Entry<K, V> e = table[i]; e != null; e = e.next) {
+            Object k;
+            if ((k = e.key) == key && (key != null && key.equals(k))) {
+                V oldVal = e.value;
+                e.value = value;
+                // break;
+                return oldVal;
+            }
+        }
+
+        addEntry(key, value, i);
+
+        return null;
+    }
+
+    private void addEntry(K key, V value, int bucketIndex) {
+        if (size >= threshold && table.length <= MAXIMUM_CAPACITY) {
+            resize();
+        }
+
+        createEntry(key, value, bucketIndex);
+    }
+
+    private void resize() {
+        int oldCapacity = table.length;
+        int newCapacity = oldCapacity >= MAXIMUM_CAPACITY ? MAXIMUM_CAPACITY : oldCapacity << 1;
+        threshold = (int) (newCapacity * loadFactor);
+        Entry<K, V>[] newTable = new Entry[newCapacity];
+
+        for (Map.Entry<K, V> e : entrySet()) {
+            K key = e.getKey();
+            V value = e.getValue();
+            int hash = key == null ? 0 : key.hashCode();
+            int i = hash(key);
+
+            newTable[i] = getEntry(key, value, newTable[i]);
+        }
+    }
+
+    private Entry<K, V> getEntry(K key, V value, Entry<K, V> next) {
+        return new Entry<>(key, value, next);
     }
 
     public static class Entry<K, V> implements Map.Entry<K, V> {
