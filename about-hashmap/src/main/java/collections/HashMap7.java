@@ -314,7 +314,8 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
                 return cursor;
             }
             Entry<K, V> e;
-            for (int i = bucketIndex + 1; i < capacity; i++, bucketIndex++) {
+            int i = index == 0 ? 0 : bucketIndex + 1;
+            for (; i < capacity; i++, bucketIndex++) {
                 e = table[i];
                 if (e != null) {
                     cursor = e;
