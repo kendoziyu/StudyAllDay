@@ -159,31 +159,68 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
 //            resize();
 //        }
         if (size >= threshold && null != table[bucketIndex]) {
-
+            resize(table.length * 2);
+            int hash = key == null ? 0 : hash(key);
+            bucketIndex = indexFor(hash, table.length);
         }
 
         createEntry(key, value, bucketIndex);
     }
 
-    private void resize() {
-        int oldCapacity = table.length;
-        int newCapacity = oldCapacity >= MAXIMUM_CAPACITY ? MAXIMUM_CAPACITY : oldCapacity << 1;
+    private void resize(int newCapacity) {
+//        int oldCapacity = table.length;
+//        int newCapacity = oldCapacity >= MAXIMUM_CAPACITY ? MAXIMUM_CAPACITY : oldCapacity << 1;
+
+        Entry[] oldTable = table;
+        int oldCapacity = oldTable.length;
+        if (oldCapacity == MAXIMUM_CAPACITY) {
+            threshold = Integer.MAX_VALUE;
+            return;
+        }
+
+//        threshold = (int) (newCapacity * loadFactor);
+//        Entry<K, V>[] newTable = new Entry[newCapacity];
+//
+//        for (Map.Entry<K, V> e : entrySet()) {
+//            K key = e.getKey();
+//            V value = e.getValue();
+//            int hash = key == null ? 0 : key.hashCode();
+//            int i = hash(key);
+//
+//            newTable[i] = getEntry(key, value, newTable[i]);
+//        }
+        Entry[] newTable = new Entry[newCapacity];
+        transfer(newTable);
+        table = newTable;
         threshold = (int) (newCapacity * loadFactor);
-        Entry<K, V>[] newTable = new Entry[newCapacity];
+    }
 
-        for (Map.Entry<K, V> e : entrySet()) {
-            K key = e.getKey();
-            V value = e.getValue();
-            int hash = key == null ? 0 : key.hashCode();
-            int i = hash(key);
 
-            newTable[i] = getEntry(key, value, newTable[i]);
+    private void transfer(Entry[] newTable) {
+        int newCapacity = newTable.length;
+        Entry[] oldTable = table;
+//        for (int i = 0; i < oldCapacity; i++) {
+        for (Entry e : oldTable) {
+//            Entry e = oldTable[i];
+            while (e != null) {
+                Entry next = e.next;
+
+//                int hash = hash(e.getKey());
+//                int newIndex = indexFor(hash, newCapacity);
+//                newTable[newIndex] = new Entry(e.getKey(), e.getValue(), newTable[newIndex]);
+//                e = e.next;
+                int hash = hash(e.key);
+                int i = indexFor(hash, newCapacity);
+                e.next = newTable[i];
+                newTable[i] = e;
+                e = next;
+            }
         }
     }
 
-    private Entry<K, V> getEntry(K key, V value, Entry<K, V> next) {
-        return new Entry<>(key, value, next);
-    }
+//    private Entry<K, V> getEntry(K key, V value, Entry<K, V> next) {
+//        return new Entry<>(key, value, next);
+//    }
 
     public static class Entry<K, V> implements Map.Entry<K, V> {
         K key;
