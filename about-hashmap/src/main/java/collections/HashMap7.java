@@ -276,6 +276,74 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
     }
 
     public Set<Map.Entry<K, V>> entrySet() {
-        return null;
+        return entrySet0();
+    }
+
+    private Set<Map.Entry<K, V>> entrySet0() {
+        return new AbstractSet<Map.Entry<K, V>>() {
+            @Override
+            public Iterator<Map.Entry<K, V>> iterator() {
+                return new HashIterator();
+            }
+
+            @Override
+            public int size() {
+                return size;
+            }
+        };
+    }
+
+    private class HashIterator implements Iterator<Map.Entry<K, V>> {
+        Entry<K, V> cursor;
+        int index = 0;
+
+        @Override
+        public boolean hasNext() {
+            return index < size;
+        }
+
+        @Override
+        public Entry<K, V> next() {
+            int capacity = table.length;
+            int hash = cursor == null ? 0 : hash(cursor.getKey());
+            int bucketIndex = cursor == null ? 0 : indexFor(hash, capacity);
+
+            cursor = cursor != null ? cursor.next : null;
+            if (cursor != null) {
+                index++;
+                return cursor;
+            }
+            Entry<K, V> e;
+            for (int i = bucketIndex + 1; i < capacity; i++, bucketIndex++) {
+                e = table[i];
+                if (e != null) {
+                    cursor = e;
+                    index++;
+                    return cursor;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            if (cursor == null) {
+                return;
+            }
+            int capacity = table.length;
+            int hash = hash(cursor.getKey());
+            int bucketIndex = indexFor(hash, capacity);
+            Entry<K, V> e = table[bucketIndex];
+            if (e == cursor) {
+                table[bucketIndex] = cursor.next;
+                index--;
+                return;
+            }
+            while (e.next != cursor) {
+                e = e.next;
+            }
+            e.next = cursor.next;
+            index--;
+        }
     }
 }

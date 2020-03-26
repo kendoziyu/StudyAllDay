@@ -18,7 +18,7 @@ public class HashMap7Test {
 
     @Test
     public void putValue() {
-        HashMap<String, String> table = new HashMap<String, String>();
+        HashMap7<String, String> table = new HashMap7<String, String>();
 
         for (int i = 0; i < array.length; i++) {
             table.put(array[i], String.valueOf(i));
