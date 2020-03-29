@@ -132,6 +132,27 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
                 number >= 1 ? Integer.highestOneBit(number - 1) << 1 : 1;
     }
 
+    @Override
+    public V get(Object key) {
+        if (key == null) {
+            return getForNullKey();
+        }
+
+        Entry<K, V> entry = getEntry(key);
+        return entry == null ? null : entry.getValue();
+    }
+
+    private V getForNullKey() {
+        if (size == 0) {
+            return null;
+        }
+        for (Entry<K, V> e = table[0]; e != null; e = e.next) {
+            if (e.key == null) {
+                return e.value;
+            }
+        }
+        return null;
+    }
 
     @Override
     public V put(K key, V value) {
