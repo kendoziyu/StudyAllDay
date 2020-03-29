@@ -37,6 +37,8 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
      */
     int size;
 
+    private EntrySet entrySet;
+
     public HashMap7(int initialCapacity, float loadFactor) {
         if (initialCapacity > MAXIMUM_CAPACITY)
             initialCapacity = MAXIMUM_CAPACITY;
@@ -222,6 +224,14 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
 //        return new Entry<>(key, value, next);
 //    }
 
+
+    @Override
+    public void clear() {
+        // super.clear();
+        Arrays.fill(table, null);
+        size = 0;
+    }
+
     public static class Entry<K, V> implements Map.Entry<K, V> {
         K key;
         V value;
@@ -280,71 +290,290 @@ public class HashMap7<K, V> extends AbstractMap<K, V> {
     }
 
     private Set<Map.Entry<K, V>> entrySet0() {
-        return new AbstractSet<Map.Entry<K, V>>() {
-            @Override
-            public Iterator<Map.Entry<K, V>> iterator() {
-                return new HashIterator();
-            }
-
-            @Override
-            public int size() {
-                return size;
-            }
-        };
+        Set<Map.Entry<K, V>> es = entrySet;
+        return es != null ? es : (entrySet = new EntrySet());
+//        return new AbstractSet<Map.Entry<K, V>>() {
+//            @Override
+//            public Iterator<Map.Entry<K, V>> iterator() {
+//                return new HashIterator();
+//            }
+//
+//            @Override
+//            public int size() {
+//                return size;
+//            }
+//        };
     }
 
-    private class HashIterator implements Iterator<Map.Entry<K, V>> {
-        Entry<K, V> cursor;
-        int index = 0;
+    private class EntrySet extends AbstractSet<Map.Entry<K, V>> {
 
         @Override
-        public boolean hasNext() {
-            return index < size;
+        public Iterator<Map.Entry<K, V>> iterator() {
+            return newEntryIterator();
         }
 
         @Override
-        public Entry<K, V> next() {
-            int capacity = table.length;
-            int hash = cursor == null ? 0 : hash(cursor.getKey());
-            int bucketIndex = cursor == null ? 0 : indexFor(hash, capacity);
+        public int size() {
+            return size;
+        }
 
-            cursor = cursor != null ? cursor.next : null;
-            if (cursor != null) {
-                index++;
-                return cursor;
+        @Override
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry)) {
+                return false;
             }
-            Entry<K, V> e;
-            int i = index == 0 ? 0 : bucketIndex + 1;
-            for (; i < capacity; i++, bucketIndex++) {
-                e = table[i];
-                if (e != null) {
-                    cursor = e;
-                    index++;
-                    return cursor;
-                }
-            }
+            Map.Entry<K, V> e = (Map.Entry<K, V>) o;
+            Entry<K, V> candidate = getEntry(e.getKey());
+            return candidate != null && candidate.equals(e);
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return removeMapping(o) != null;
+        }
+
+        @Override
+        public void clear() {
+//             super.clear();
+            HashMap7.this.clear();
+        }
+    }
+
+
+    Entry<K, V> removeMapping(Object o) {
+        if (size == 0 || !(o instanceof Map.Entry)) {
             return null;
+        }
+
+        Map.Entry<K, V> entry = (Map.Entry<K, V>) o;
+        Object key = entry.getKey();
+        int hash = (key == null) ? 0 : hash(key);
+        int i = indexFor(hash, table.length);
+
+        Entry<K, V> e = table[i];
+        Entry<K, V> prev = e;
+        while (e != null) {
+            Entry<K, V> next = e.next;
+            if (e.equals(entry)) {
+                size--;
+                if (e == prev) {
+                    table[i] = next;
+                } else {
+                    prev.next = next;
+                }
+                // 找到了目标元素，可以直接返回了
+                return e;
+            }
+
+            prev = e;
+            e = next;
+        }
+        return e;
+    }
+
+
+    final Entry<K, V> getEntry(Object key) {
+        if (size == 0) {
+            return null;
+        }
+
+        int hash = key == null ? 0 : hash(key);
+        int i = indexFor(hash, table.length);
+        for (Entry<K, V> e = table[i];
+             e != null;
+             e = e.next) {
+            Object k;
+            if ((k = e.key) == key || (k != null && k.equals(key))) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    private abstract class HashIterator<E> implements Iterator<E> {
+        Entry<K, V> current;
+        Entry<K, V> next;
+        int index;
+
+        public HashIterator() {
+            // 找到第一个元素，赋值给next
+//            for (index = 0; (next = table[index]) == null; index++)
+//                ;
+            if (size > 0) {
+                Entry[] t = table;
+                while (index < t.length && (next = t[index++]) == null)
+                    ;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        Entry<K, V> nextEntry() {
+//            if (size == 0) return null;
+            if (next == null) {
+                throw new NoSuchElementException();
+            }
+
+            Entry<K, V> e = next;
+            if ((next = e.next) == null) {
+                Entry[] t = table;
+                while (index < t.length && (next = t[index++]) == null)
+                    ;
+            }
+            current = e;
+            return e;
+//            if (e.next != null) {
+//                next = e.next;
+//                return current;
+//            }
+//            int capacity = table.length;
+//            while ((e = table[index++]) == null && index < capacity)
+//                ;
+//
+//            next = e;
+//            return current;
         }
 
         @Override
         public void remove() {
-            if (cursor == null) {
-                return;
+            if (current == null) {
+                throw new IllegalStateException();
             }
-            int capacity = table.length;
-            int hash = hash(cursor.getKey());
-            int bucketIndex = indexFor(hash, capacity);
-            Entry<K, V> e = table[bucketIndex];
-            if (e == cursor) {
-                table[bucketIndex] = cursor.next;
-                index--;
-                return;
-            }
-            while (e.next != cursor) {
-                e = e.next;
-            }
-            e.next = cursor.next;
-            index--;
+            Object k = current.getKey();
+            current = null;
+            HashMap7.this.removeEntryForKey(k);
         }
     }
+
+    private Entry<K, V> removeEntryForKey(Object key) {
+        if (size == 0) {
+            return null;
+        }
+
+        int hash = key == null ? 0 : hash(key);
+        int i = indexFor(hash, table.length);
+
+        // 因为需要删除元素，所以需要保存前一个元素
+        Entry prev = table[i];
+        // 这个是需要删除的元素
+        Entry e = prev;
+
+        while (e != null) {
+            // 使用了多次e.next
+            Entry next = e.next;
+            Object k;
+            // 判断键相等，执行删除
+            if ((k = e.key) == key || (k != null && k.equals(key))) {
+                size--;
+                if (prev == e) {
+                    table[i] = next;
+                } else {
+                    prev.next = next;
+                }
+                return e;
+            }
+
+            prev = e;
+            e = next;
+        }
+
+        return e;
+    }
+
+    private class EntryIterator extends HashIterator<Map.Entry<K, V>> {
+
+        @Override
+        public Map.Entry<K, V> next() {
+            return nextEntry();
+        }
+    }
+
+    private class KeyIterator extends HashIterator<K> {
+
+        @Override
+        public K next() {
+            Entry<K, V> e = nextEntry();
+            return e == null ? null : e.getKey();
+        }
+    }
+
+    private class ValueIterator extends HashIterator<V> {
+
+        @Override
+        public V next() {
+            Entry<K, V> e = nextEntry();
+            return e == null ? null : e.getValue();
+        }
+    }
+
+    Iterator<K> newKeyIterator() {
+        return new KeyIterator();
+    }
+
+    Iterator<V> newValueIterator() {
+        return new ValueIterator();
+    }
+
+    Iterator<Map.Entry<K, V>> newEntryIterator() {
+        return new EntryIterator();
+    }
+
+
+//    private class HashIterator implements Iterator<Map.Entry<K, V>> {
+//        Entry<K, V> cursor;
+//        int index = 0;
+//
+//        @Override
+//        public boolean hasNext() {
+//            return index < size;
+//        }
+//
+//        @Override
+//        public Entry<K, V> next() {
+//            int capacity = table.length;
+//            int hash = cursor == null ? 0 : hash(cursor.getKey());
+//            int bucketIndex = cursor == null ? 0 : indexFor(hash, capacity);
+//
+//            cursor = cursor != null ? cursor.next : null;
+//            if (cursor != null) {
+//                index++;
+//                return cursor;
+//            }
+//            Entry<K, V> e;
+//            int i = index == 0 ? 0 : bucketIndex + 1;
+//            for (; i < capacity; i++, bucketIndex++) {
+//                e = table[i];
+//                if (e != null) {
+//                    cursor = e;
+//                    index++;
+//                    return cursor;
+//                }
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public void remove() {
+//            if (cursor == null) {
+//                return;
+//            }
+//            int capacity = table.length;
+//            int hash = hash(cursor.getKey());
+//            int bucketIndex = indexFor(hash, capacity);
+//            Entry<K, V> e = table[bucketIndex];
+//            if (e == cursor) {
+//                table[bucketIndex] = cursor.next;
+//                index--;
+//                return;
+//            }
+//            while (e.next != cursor) {
+//                e = e.next;
+//            }
+//            e.next = cursor.next;
+//            index--;
+//        }
+//    }
 }
