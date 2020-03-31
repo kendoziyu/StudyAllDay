@@ -111,69 +111,83 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
     }
 
     private void fixAfterInsertion(Entry<K, V> c) {
-        if (c == root) {
-            c.color = BLACK;
-            return;
-        }
+//        if (c == root) {
+//            c.color = BLACK;
+//            return;
+//        }
+//        c.color = RED;
+//        if (colorOf(parentOf(c)) == BLACK) {
+//            return;
+//        }
         c.color = RED;
-        if (colorOf(parentOf(c)) == BLACK) {
-            return;
-        }
-        if (leftOf(parentOf(parentOf(c))) == parentOf(c)) {
-            // 父结点是祖父结点的左结点
-            if (colorOf(rightOf(parentOf(parentOf(c)))) == RED) {
-                // 叔叔结点是红色
-                parentOf(c).color = BLACK;
-                rightOf(parentOf(parentOf(c))).color = BLACK;
-                parentOf(parentOf(c)).color = RED;
-                // 把祖父结点当做新增结点，重新调整
-                fixAfterInsertion(parentOf(parentOf(c)));
-            } else {
-                Entry<K, V> tree = parentOf(parentOf(c));
-                Entry<K, V> parent = parentOf(c);
-                // 叔叔结点不存在或者是黑色
-                if (rightOf(parentOf(c)) == c) {
-                    // 4.2 三角关系
-                    leftRotate(parentOf(c));
-                }
-                tree.color = !tree.color;
-                parent.color = !parent.color;
-                // 4.1 三点一线
-                rightRotate(tree);
-            }
-        } else {
-            // 父结点是祖父结点的右结点
-            if (colorOf(leftOf(parentOf(parentOf(c)))) == RED) {
-                // 叔叔结点是红色
-                parentOf(c).color = BLACK;
-                leftOf(parentOf(parentOf(c))).color = BLACK;
-                parentOf(parentOf(c)).color = RED;
-                // 把祖父结点当做新增结点，重新调整
-                fixAfterInsertion(parentOf(parentOf(c)));
-            } else {
-                Entry<K, V> tree = parentOf(parentOf(c));
-                Entry<K, V> parent = parentOf(c);
-                // 叔叔结点不存在或者是黑色
-                if (leftOf(parentOf(c)) == c) {
-                    // 4.2 三角关系
-                    rightRotate(parentOf(c));
-                }
-                // 4.1 三点一线
-                tree.color = !tree.color;
-                parent.color = !parent.color;
-                leftRotate(tree);
-            }
-        }
-    }
+        while (c != null && c != this.root && c.parent.color == RED) {
+            if (leftOf(parentOf(parentOf(c))) == parentOf(c)) {
+                // 父结点是祖父结点的左结点
+                Entry<K, V> uncle = rightOf(parentOf(parentOf(c)));
+                if (colorOf(uncle) == RED) {
+                    // 叔叔结点是红色
+//                parentOf(c).color = BLACK;
+//                rightOf(parentOf(parentOf(c))).color = BLACK;
+//                parentOf(parentOf(c)).color = RED;
+                    setColor(parentOf(c), BLACK);
+                    setColor(uncle, BLACK);
+                    setColor(parentOf(parentOf(c)), RED);
+                    // 把祖父结点当做新增结点，重新调整
+//                fixAfterInsertion(parentOf(parentOf(c)));
+                    c = parentOf(parentOf(c));
+                } else {
+//                    Entry<K, V> tree = parentOf(parentOf(c));
+//                    Entry<K, V> parent = parentOf(c);
+                    // 叔叔结点不存在或者是黑色
+                    if (rightOf(parentOf(c)) == c) {
+                        // 4.2 三角关系
+//                        leftRotate(parentOf(c));
+                        c = parentOf(c);
+                        leftRotate(c);
+                    }
 
-    private void rightRotate(Entry<K, V> root) {
-        if (root != null) {
-            Entry<K, V> pivot = root.left;
-            pivot.parent = root.parent;
-            pivot.right = root;
-            root.parent = pivot;
-            root.left = null;
+//                    tree.color = !tree.color;
+//                    parent.color = !parent.color;
+                    // 4.1 三点一线
+//                    rightRotate(tree);
+                    setColor(parentOf(c), BLACK);
+                    setColor(parentOf(parentOf(c)), RED);
+                    rightRotate(parentOf(parentOf(c)));
+                }
+            } else {
+                // 父结点是祖父结点的右结点
+                Entry<K, V> uncle = leftOf(parentOf(parentOf(c)));
+                if (colorOf(uncle) == RED) {
+                    // 叔叔结点是红色
+//                    parentOf(c).color = BLACK;
+//                    leftOf(parentOf(parentOf(c))).color = BLACK;
+//                    parentOf(parentOf(c)).color = RED;
+                    setColor(parentOf(c), BLACK);
+                    setColor(uncle, BLACK);
+                    setColor(parentOf(parentOf(c)), RED);
+                    // 把祖父结点当做新增结点，重新调整
+//                    fixAfterInsertion(parentOf(parentOf(c)));
+                    c = parentOf(parentOf(c));
+                } else {
+//                    Entry<K, V> tree = parentOf(parentOf(c));
+//                    Entry<K, V> parent = parentOf(c);
+                    // 叔叔结点不存在或者是黑色
+                    if (leftOf(parentOf(c)) == c) {
+                        // 4.2 三角关系
+                        c = parentOf(c);
+                        rightRotate(c);
+                    }
+                    // 4.1 三点一线
+//                    tree.color = !tree.color;
+//                    parent.color = !parent.color;
+//                    leftRotate(tree);
+                    setColor(parentOf(c), BLACK);
+                    setColor(parentOf(parentOf(c)), RED);
+                    leftRotate(parentOf(parentOf(c)));
+                }
+            }
         }
+        root.color = BLACK;
     }
 
     private void leftRotate(Entry<K, V> root) {
@@ -194,6 +208,27 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
 //            root.right = null;
         }
     }
+
+    private void rightRotate(Entry<K, V> root) {
+        if (root != null) {
+            Entry<K, V> pivot = root.left;
+            root.left = pivot.right;
+            if (pivot.right != null)
+                pivot.right.parent = root;
+            pivot.parent = root.parent;
+            if (root.parent == null)
+                this.root = pivot;
+            else if (root.parent.left == root)
+                root.parent.left = pivot;
+            else
+                root.parent.right = pivot;
+            pivot.right = root;
+            root.parent = pivot;
+//            root.left = null;
+        }
+    }
+
+
 
     static <K, V> void setColor(Entry<K, V> node, boolean color) {
         if (node != null) {
