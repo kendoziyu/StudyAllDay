@@ -19,6 +19,81 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
+
+    @Override
+    public V remove(Object key) {
+        Entry<K, V> node = getEntry(key);
+        if (node == null)
+            return null;
+        V oldValue = node.value;
+        deleteEntry(node);
+        return oldValue;
+    }
+
+    Entry<K, V> getEntry(Object key) {
+//        if (key == null) {
+//            throw new NullPointerException();
+//        }
+        Entry<K, V> p = root;
+        Comparator<? super K> cpr = this.comparator;
+        int cmp;
+        if (cpr != null) {
+            while (p != null) {
+                cmp = cpr.compare(p.key, (K) key);
+                if (cmp > 0) {
+                    p = p.left;
+                } else if (cmp < 0) {
+                    p = p.right;
+                } else {
+                    return p;
+                }
+
+            }
+        } else {
+            if (key == null) {
+                throw new NullPointerException();
+            }
+//            if (!(key instanceof Comparable)) {
+//                throw new ClassCastException();
+//            }
+            while (p != null) {
+                Comparable<? super K> k = (Comparable<? super K>) key;
+                cmp = k.compareTo(p.key);
+                if (cmp < 0) {
+                    p = p.left;
+                } else if (cmp > 0) {
+                    p = p.right;
+                } else {
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
+
+    void deleteEntry(Entry<K, V> node) {
+        if (node == null)
+            return;
+        if (node.left == null || node.right == null) {
+            if (node.parent != null) {
+                if (node.parent.left == node) {
+                    node.parent.left = node.left != null ? node.left : node.right;
+                } else {
+                    node.parent.right = node.left != null ? node.left : node.right;
+                }
+            }
+            node.parent = null;
+        } else {
+
+        }
+        fixAfterDeletion(node);
+        size--;
+    }
+
+    private void fixAfterDeletion(Entry<K, V> node) {
+
+    }
+
     @Override
     public V put(K key, V value) {
         Entry<K, V> e = root;
