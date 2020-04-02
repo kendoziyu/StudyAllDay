@@ -94,6 +94,27 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
 
     }
 
+    static <K, V> TreeMap.Entry<K, V> successor(Entry<K, V> node) {
+        if (node == null)
+            return null;
+        if (node.right != null) {
+            Entry<K, V> p = node.right;
+            while (p.left != null) {
+                // node = p;
+                p = p.left;
+            }
+            return p;
+        } else {
+            Entry<K, V> p = node.parent;
+            Entry<K, V> ch = node;
+            while (p != null && ch.right == node) {
+                ch = p;
+                p = p.parent;
+            }
+            return p;
+        }
+    }
+
     @Override
     public V put(K key, V value) {
         Entry<K, V> e = root;
