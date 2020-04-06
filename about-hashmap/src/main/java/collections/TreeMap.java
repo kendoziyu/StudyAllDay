@@ -71,27 +71,76 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
-    void deleteEntry(Entry<K, V> node) {
-        if (node == null)
-            return;
-        if (node.left == null || node.right == null) {
-            if (node.parent != null) {
-                if (node.parent.left == node) {
-                    node.parent.left = node.left != null ? node.left : node.right;
-                } else {
-                    node.parent.right = node.left != null ? node.left : node.right;
-                }
+    void deleteEntry(Entry<K, V> p) {
+        size--;
+        // 1 Node to be deleted has two children
+        if (p.left != null && p.right != null) {
+            // 1-1.find inorder successor of the node
+            Entry<K, V> s = successor(p);
+            // 1-2.copy contents of the inorder successor to the node
+            p.key = s.key;
+            p.value = s.value;
+            /*1-3.delete the inorder successor
+            deleteEntry(node);
+            return;*/
+            // 1-3.make p point to successor
+            p = s;
+        }
+        Entry<K, V> replacement = p.left != null ? p.left : p.right;
+        // 2 Node to be deleted has only one child
+        if (replacement != null) {
+
+            replacement.parent = p.parent;
+            // 2-2
+            if (p.parent == null) {
+                root = replacement;
+            } else if (p.parent.left == p) {
+                p.parent.left = replacement;
+            } else {
+                p.parent.right = replacement;
             }
-            node.parent = null;
+
+            p.left = p.right = p.parent = null;
+
+            // fix replacement
+            if (p.color == BLACK)
+                fixAfterDeletion(replacement);
+        } else if (p.parent == null) {
+            root = null;
         } else {
+            // 3 Node to be deleted has no children
+            // Use self as phantom replacement
+            if (p.color == BLACK)
+                fixAfterDeletion(p);
+
+            // simply remove it from the tree
+            if (p == p.parent.left) {
+                p.parent.left = null;
+            } else if (p == p.parent.right) {
+                p.parent.right = null;
+            }
+            p.parent = null;
 
         }
-        fixAfterDeletion(node);
-        size--;
+
     }
 
-    private void fixAfterDeletion(Entry<K, V> node) {
+    private void fixAfterDeletion(Entry<K, V> x) {
+//        while (x != null && x != root && x.color == BLACK) {
+        while (x != root && x.color == BLACK) {
+            if (x == leftOf(parentOf(x))) {
+                Entry<K, V> sib = rightOf(parentOf(x));
 
+                if (sib.color == RED) {
+                    leftRotate(parentOf(x));
+                    x = sib;
+                    setColor(x.left, RED);
+                }
+            } else {
+
+            }
+        }
+        setColor(x, BLACK);
     }
 
     static <K, V> TreeMap.Entry<K, V> successor(Entry<K, V> node) {
