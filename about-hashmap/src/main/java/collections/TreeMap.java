@@ -71,27 +71,112 @@ public class TreeMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
-    void deleteEntry(Entry<K, V> node) {
-        if (node == null)
-            return;
-        if (node.left == null || node.right == null) {
-            if (node.parent != null) {
-                if (node.parent.left == node) {
-                    node.parent.left = node.left != null ? node.left : node.right;
-                } else {
-                    node.parent.right = node.left != null ? node.left : node.right;
+    void deleteEntry(Entry<K, V> p) {
+        size--;
+        if (p.left != null && p.right != null) {
+            Entry<K, V> succ = successor(p);
+            p.key = succ.key;
+            p.value = succ.value;
+            p = succ;
+        }
+
+        // If strictly internal, copy successor's element to p and then make p
+        // point to successor.
+        Entry<K, V> replacement = p.left != null ? p.left : p.right;
+        if (replacement != null) {
+            replacement.parent = p.parent;
+            if (p.parent == null) {
+                root = replacement;
+            } else if (p.parent.left == p){
+                p.parent.left = replacement;
+            } else {
+                p.parent.right = replacement;
+            }
+
+            p.parent = p.left = p.right = null;
+
+            if (p.color == BLACK)
+                fixAfterDeletion(replacement);
+
+        } else if (p.parent == null) {
+            root = null;
+        } else { // no children.
+            if (p.color == BLACK)
+                fixAfterDeletion(p);
+
+            if (p.parent != null) {
+                if (p.parent.left == p) {
+                    p.parent.left = null;
+                } else if (p.parent.right == p) {
+                    p.parent.right = null;
                 }
             }
-            node.parent = null;
-        } else {
 
         }
-        fixAfterDeletion(node);
-        size--;
+
     }
 
-    private void fixAfterDeletion(Entry<K, V> node) {
+    private void fixAfterDeletion(Entry<K, V> x) {
+//        while (x != root && x.color == BLACK) {
+        while (x != root && colorOf(x) == BLACK) {
+            if (leftOf(parentOf(x)) == x) {
+                Entry<K, V> sib = rightOf(parentOf(x));
+                if (colorOf(sib) == RED) {
+                    setColor(parentOf(x), RED);
+                    setColor(sib, BLACK);
+                    leftRotate(parentOf(x));
+                    sib = rightOf(parentOf(x)); // 这个哥们一定是黑的
+                }
 
+                if (colorOf(leftOf(sib)) == BLACK &&
+                    colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rightRotate(sib);
+                        sib = rightOf(parentOf(x));
+                    }
+
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(sib), BLACK);
+                    leftRotate(parentOf(x));
+                    x = root;
+                }
+            } else {
+                Entry<K, V> sib = leftOf(parentOf(x));
+                if (colorOf(sib) == RED) {
+                    setColor(parentOf(x), RED);
+                    setColor(sib, BLACK);
+                    rightRotate(parentOf(x));
+                    sib = leftOf(parentOf(x));
+                }
+
+                if (colorOf(leftOf(sib)) == BLACK &&
+                        colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(sib)) == BLACK) {
+                        setColor(rightOf(sib), BLACK);
+                        setColor(sib, RED);
+                        leftRotate(sib);
+                        sib = leftOf(parentOf(x));
+                    }
+
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(sib), BLACK);
+                    rightRotate(parentOf(x));
+                    x = root;
+
+                }
+            }
+        }
+        setColor(x, BLACK);
     }
 
     static <K, V> TreeMap.Entry<K, V> successor(Entry<K, V> node) {
