@@ -1,6 +1,7 @@
 package helloworld;
 
 import concurrent.CASLock;
+import concurrent.ParkLock;
 
 /**
  * 描述:  自制自旋锁测试 <br>
@@ -10,7 +11,8 @@ import concurrent.CASLock;
  */
 public class CustomCASTest {
 
-    static CASLock lock = new CASLock();
+//    static CASLock lock = new CASLock();
+    static ParkLock lock = new ParkLock();
 
     public static void main(String[] args) {
         Runnable task = new Runnable() {

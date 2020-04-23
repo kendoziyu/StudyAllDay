@@ -8,7 +8,7 @@ import java.util.concurrent.locks.LockSupport;
  * @author: skilled-peon <br>
  * @date: 2020/4/16 0016 <br>
  */
-public class ParkTest {
+public class SimpleParkTest {
 
     public static void main(String[] args) {
         Thread t1 = new Thread(new Runnable() {
