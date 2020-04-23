@@ -1,6 +1,7 @@
 package concurrent;
 
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -12,7 +13,7 @@ import java.util.concurrent.locks.LockSupport;
 public class ParkLock {
 
     volatile int status = 0;
-    Queue<Thread> waitQueue;
+    Queue<Thread> waitQueue = new ConcurrentLinkedQueue<Thread>();
 
     public void lock() {
         while(!compareAndSet(0, 1)) {
