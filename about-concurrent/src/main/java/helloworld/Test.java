@@ -12,20 +12,21 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Test {
 
-    static ReentrantLock lock = new ReentrantLock();
+    static ReentrantLock lock = new ReentrantLock(true);
 
     public static void main(String[] args) {
         Runnable task = new Runnable() {
             public void run() {
-                noLockTest();
+                // noLockTest();
                 testSync();
             }
         };
         Thread t1 = new Thread(task, "t1");
         Thread t2 = new Thread(task, "t2");
-
+        Thread t3 = new Thread(task, "t3");
         t1.start();
         t2.start();
+        t3.start();
     }
 
     public static void noLockTest() {
@@ -41,7 +42,7 @@ public class Test {
         lock.lock();
         System.out.println("sync:" + Thread.currentThread().getName());
         try {
-            Thread.sleep(2000);
+            Thread.sleep(2000000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
