@@ -11,7 +11,6 @@ public class Worker implements Runnable {
         this.id = id;
     }
 
-    @Override
     public void run() {
         try {
             System.out.println(Thread.currentThread().getName() + " 执行任务 " + id);
