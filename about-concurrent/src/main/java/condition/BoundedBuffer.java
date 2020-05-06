@@ -74,8 +74,8 @@ public class BoundedBuffer {
             public void run() {
                 try {
                     for (int i = 1; i <= 101; i++) {
+                        Thread.sleep(60000);
                         buffer.put(i);
-                        Thread.sleep(10000);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
