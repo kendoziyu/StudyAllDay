@@ -59,11 +59,8 @@ public class BoundedBuffer {
         Runnable consumer = new Runnable() {
             public void run() {
                 try {
-                    for (int i = 0; i < 101; i++) {
-                        Object item = buffer.take();
-                        System.out.println(item);
-                        Thread.sleep(1000);
-                    }
+                    Object item = buffer.take();
+                    System.out.println(Thread.currentThread().getName() + " consume one:" + item);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -73,9 +70,11 @@ public class BoundedBuffer {
         Runnable producer = new Runnable() {
             public void run() {
                 try {
-                    for (int i = 1; i <= 101; i++) {
+                    for (int i = 1;; i++) {
+                        // 1分钟生产一个
                         Thread.sleep(60000);
                         buffer.put(i);
+                        System.out.println(Thread.currentThread().getName() + " produce one:" + i);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -83,7 +82,10 @@ public class BoundedBuffer {
             }
         };
 
-        new Thread(consumer, "consumer").start();
+        for (int i = 0; i < 3; i++) {
+            new Thread(consumer, "consumer" + i).start();
+        }
+
         new Thread(producer, "producer").start();
 
     }
