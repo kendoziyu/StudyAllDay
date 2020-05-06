@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.focusteach.test</groupId>
-    <artifactId>learn-java</artifactId>
+    <artifactId>learn-concurrent</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
