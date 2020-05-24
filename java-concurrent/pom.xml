@@ -7,12 +7,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.focusteach.test</groupId>
-    <artifactId>learn-concurrent</artifactId>
+    <artifactId>java-concurrent</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>learn-java</name>
-    <description>Learn Java</description>
+    <name>java-concurrent</name>
+    <description>Java Concurrent</description>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
