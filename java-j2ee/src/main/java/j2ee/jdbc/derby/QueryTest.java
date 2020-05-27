@@ -57,7 +57,7 @@ public class QueryTest {
                 query = "SELECT Name FROM Publishers";
                 try (ResultSet rs = stat.executeQuery(query)) {
                     while (rs.next()) {
-                        authors.add(rs.getString(1));
+                        publishers.add(rs.getString(1));
                     }
                 }
                 boolean done = false;
