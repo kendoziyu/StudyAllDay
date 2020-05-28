@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.Properties;
 import java.util.Scanner;
 
+import static j2ee.jdbc.derby.Util.getConnection;
+
 /**
  * 描述: 输入sql并执行 <br>
  *
@@ -99,28 +101,5 @@ public class ExecSQL {
         }
 
 
-    }
-
-    /**
-     * 根据配置文件信息获取连接
-     * @return
-     * @throws IOException
-     * @throws SQLException
-     */
-    public static Connection getConnection() throws IOException, SQLException {
-        Properties props = new Properties();
-        try (InputStream in = ExecSQL.class.getClassLoader().getResourceAsStream("database.properties")) {
-            props.load(in);
-        }
-
-        String drivers = props.getProperty("jdbc.drivers");
-        if (drivers != null)
-            System.out.println(drivers);
-
-        String url = props.getProperty("jdbc.url");
-        String username = props.getProperty("jdbc.username");
-        String password = props.getProperty("jdbc.password");
-
-        return DriverManager.getConnection(url, username, password);
     }
 }

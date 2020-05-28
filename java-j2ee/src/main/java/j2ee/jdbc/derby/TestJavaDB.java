@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Properties;
 
+import static j2ee.jdbc.derby.Util.getConnection;
+
 /**
  * 描述: Apache Derby 也称为 Java DB <br>
  *
@@ -44,26 +46,6 @@ public class TestJavaDB {
         }
     }
 
-    /**
-     * 获取一个 SQL 连接
-     * @return
-     * @throws IOException
-     * @throws SQLException
-     */
-    public static Connection getConnection() throws IOException, SQLException {
-        Properties props = new Properties();
 
-        try (InputStream in = TestJavaDB.class.getClassLoader().getResourceAsStream("database.properties")) {
-            props.load(in);
-        }
-        String drivers = props.getProperty("jdbc.drivers");
-        if (drivers != null)
-            System.out.println(drivers);
-        String url = props.getProperty("jdbc.url");
-        String username = props.getProperty("jdbc.username");
-        String password = props.getProperty("jdbc.password");
-
-        return DriverManager.getConnection(url, username, password);
-    }
 
 }

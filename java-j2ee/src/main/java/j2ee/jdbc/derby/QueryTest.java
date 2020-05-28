@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 
+import static j2ee.jdbc.derby.Util.getConnection;
+
 /**
- * 描述:  <br>
+ * 描述: 预编译语句 <br>
  *
  * @author: skilled-peon <br>
  * @date: 2020/5/27 0027 <br>
@@ -132,28 +134,5 @@ public class QueryTest {
                 return options.get(sel - 1);
             }
         }
-    }
-
-
-    /**
-     * 获取一个 SQL 连接
-     * @return
-     * @throws IOException
-     * @throws SQLException
-     */
-    public static Connection getConnection() throws IOException, SQLException {
-        Properties props = new Properties();
-
-        try (InputStream in = TestJavaDB.class.getClassLoader().getResourceAsStream("database.properties")) {
-            props.load(in);
-        }
-        String drivers = props.getProperty("jdbc.drivers");
-        if (drivers != null)
-            System.out.println(drivers);
-        String url = props.getProperty("jdbc.url");
-        String username = props.getProperty("jdbc.username");
-        String password = props.getProperty("jdbc.password");
-
-        return DriverManager.getConnection(url, username, password);
     }
 }
