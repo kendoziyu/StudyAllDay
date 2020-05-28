@@ -23,6 +23,17 @@ public class ExecSQL {
             // 返回0表示不限制或者未知的
             System.out.println("Max Connections:" + dbMetaData.getMaxConnections());
             System.out.println("Max Statements:" + dbMetaData.getMaxStatements());
+            System.out.println("Supports TYPE_FORWARD_ONLY:" + dbMetaData.supportsResultSetType(ResultSet.TYPE_FORWARD_ONLY));
+            System.out.println("Supports CURSOR_READ_ONLY:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY));
+            System.out.println("Supports CONCUR_UPDATABLE:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE));
+            System.out.println("Supports TYPE_SCROLL_INSENSITIVE:" + dbMetaData.supportsResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE));
+            System.out.println("Supports CURSOR_READ_ONLY:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY));
+            System.out.println("Supports CONCUR_UPDATABLE:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE));
+            System.out.println("Supports TYPE_SCROLL_SENSITIVE:" + dbMetaData.supportsResultSetType(ResultSet.TYPE_SCROLL_SENSITIVE));
+            System.out.println("Supports CURSOR_READ_ONLY:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY));
+            System.out.println("Supports CONCUR_UPDATABLE:" + dbMetaData.supportsResultSetConcurrency(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE));
+            System.out.println("Supports BatchUpdates:" + dbMetaData.supportsBatchUpdates());
+
             Statement stat = conn.createStatement();
             while (true) {
                 if (args.length == 0)
