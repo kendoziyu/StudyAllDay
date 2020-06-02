@@ -1,0 +1,4 @@
+Premain-Class: cn.skilled.peon.agent.MonitorAgent
+Agent-Class: cn.skilled.peon.agent.MonitorAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
