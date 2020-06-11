@@ -35,7 +35,7 @@ public class Context {
 
     @Test
     public void test(){
-        List<Object> list=new ArrayList<>();
+        final List<Object> list=new ArrayList<>();
         ResultHandler handler=new ResultHandler() {
             @Override
             public void handleResult(ResultContext resultContext) {
