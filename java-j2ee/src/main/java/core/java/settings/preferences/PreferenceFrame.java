@@ -21,7 +21,7 @@ class PreferenceFrame extends JFrame {
     private static final int DEFAULT_HEIGHT = 200;
 
     public PreferenceFrame() {
-        Preferences root = Preferences.userRoot();
+        Preferences root = Preferences.userRoot(); //HKEY_CURRENT_USER\Software\JavaSoft\Prefs
         final Preferences node = root.node("/com/test/corejava");
 
         // 设置相对位置和宽高
