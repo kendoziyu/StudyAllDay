@@ -4,10 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 /**
  * 描述:  <br>
@@ -20,7 +17,7 @@ public class FilesTest {
     @Test
     public void inputStream() {
         Path path = Paths.get(System.getProperty("user.dir"), "README.md");
-        try (InputStream in = Files.newInputStream(path, new OpenOption[]{})) {
+        try (InputStream in = Files.newInputStream(path, StandardOpenOption.READ)) {
             System.out.println(in.available());
         } catch (IOException e) {
             e.printStackTrace();
