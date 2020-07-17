@@ -15,7 +15,7 @@ public class StreamFeaturesTest {
      */
     @Test
     public void test1() {
-        List<Integer> list =  Stream.of(1, 2, 3).filter(val-> val> 2).collect(Collectors.toList());
+        List<Integer> list =  Stream.of(1, 2, 5, 9, 7, 3).filter(val-> val> 2).sorted().collect(Collectors.toList());
         for (Integer item : list) {
             System.out.println(item);
         }
