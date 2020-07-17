@@ -3,10 +3,13 @@ package core.java.stream;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
@@ -46,5 +49,35 @@ public class StreamStatisticsTest {
     public void sumGroupBy() {
         Map<String, Integer> collect = appleStore.stream().collect(groupingBy(Apple::getColor, summingInt(Apple::getWeight)));
         collect.forEach((color, weight) -> System.out.println(color + " apple weight: " + weight));
+    }
+
+    @Test
+    public void flatMap() {
+        Stream<int[]> stream = IntStream.rangeClosed(1, 100)
+                .boxed()
+                .flatMap(a -> IntStream.rangeClosed(a, 100)
+                        .filter(b -> Math.sqrt(a * a + b * b) % 1 == 0)
+                        .mapToObj(b -> new int[]{a, b, (int) Math.sqrt(a * a + b * b)})
+                );
+        stream.limit(5).forEach(a -> System.out.println(a[0] + " " + a[1] + " " + a[2]));
+    }
+
+    @Test
+    public void equalFlatMap() {
+        List<int[]> resultList = new ArrayList<>();
+        for (int a = 1; a <= 100; a++) {
+            for (int b = a; b <= 100; b++) {
+                double c = Math.sqrt(a * a + b * b);
+                if (c % 1 == 0) {
+                    resultList.add(new int[]{a, b, (int) c});
+                }
+            }
+        }
+
+        int size = resultList.size();
+        for (int i = 0; i < size && i < 5; i++) {
+            int[] a = resultList.get(i);
+            System.out.println(a[0] + " " + a[1] + " " + a[2]);
+        }
     }
 }
