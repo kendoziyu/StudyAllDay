@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
@@ -39,5 +40,11 @@ public class StreamStatisticsTest {
     public void reduce() {
         Integer sum = appleStore.stream().collect(reducing(0, Apple::getWeight, (a, b) -> a + b));
         System.out.println(sum);
+    }
+
+    @Test
+    public void sumGroupBy() {
+        Map<String, Integer> collect = appleStore.stream().collect(groupingBy(Apple::getColor, summingInt(Apple::getWeight)));
+        collect.forEach((color, weight) -> System.out.println(color + " apple weight: " + weight));
     }
 }
