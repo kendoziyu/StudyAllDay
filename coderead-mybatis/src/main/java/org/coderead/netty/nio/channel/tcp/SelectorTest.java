@@ -10,62 +10,52 @@ import java.nio.channels.*;
 public class SelectorTest {
 
     Selector selector;
+
     @Before
     public void init() throws IOException {
         selector = Selector.open();
     }
-    @Test
-    public void tcpOps() throws IOException {
-        DatagramChannel channel = DatagramChannel.open();
-        printSupport(channel, SelectionKey.OP_ACCEPT, "OP_ACCEPT");
-        printSupport(channel, SelectionKey.OP_READ, "OP_READ");
-        printSupport(channel, SelectionKey.OP_CONNECT, "OP_CONNECT");
-        printSupport(channel, SelectionKey.OP_WRITE, "OP_WRITE");
-    }
 
     @Test(expected = IllegalArgumentException.class)
-    public void registerUnsupported() throws IOException {
+    public void IllegalArgumentException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.register(selector, SelectionKey.OP_ACCEPT);
     }
 
     @Test(expected = IllegalBlockingModeException.class)
-    public void registerSupported() throws IOException {
+    public void IllegalBlockingModeException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.register(selector, SelectionKey.OP_READ);
     }
 
-    @Test
-    public void registerCancelled() throws IOException {
+    @Test(expected = CancelledKeyException.class)
+    public void CancelledKeyException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
         SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
         key.cancel();
-        key = channel.register(selector, SelectionKey.OP_READ);
+        selector.selectNow();
+        channel.register(selector, SelectionKey.OP_WRITE);
     }
 
     @Test(expected = ClosedSelectorException.class)
-    public void registerWhenSelectorColsed() throws IOException {
+    public void ClosedSelectorException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
-        SelectionKey key = channel.register(selector, SelectionKey.OP_WRITE);
         selector.close();
-        key = channel.register(selector, SelectionKey.OP_WRITE);
+        channel.register(selector, SelectionKey.OP_READ);
     }
 
     @Test(expected = ClosedChannelException.class)
-    public void registerWhenChannelClosed() throws IOException {
+    public void ClosedChannelException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
-        SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
         channel.close();
-        key = channel.register(selector, SelectionKey.OP_WRITE);
+        channel.register(selector, SelectionKey.OP_WRITE);
     }
     @Test
-    public void udpOps() throws IOException {
+    public void printDatagramChannelValidOps() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
-        channel.bind(new InetSocketAddress(8080));
-        Selector selector = Selector.open();
         printSupport(channel, SelectionKey.OP_ACCEPT, "OP_ACCEPT");
         printSupport(channel, SelectionKey.OP_READ, "OP_READ");
         printSupport(channel, SelectionKey.OP_CONNECT, "OP_CONNECT");
@@ -73,10 +63,8 @@ public class SelectorTest {
     }
 
     @Test
-    public void serverSocketChannelTest() throws IOException {
+    public void printServerSocketChannelValidOps() throws IOException {
         ServerSocketChannel channel = ServerSocketChannel.open();
-        channel.bind(new InetSocketAddress(8080));
-        Selector selector = Selector.open();
         printSupport(channel, SelectionKey.OP_ACCEPT, "OP_ACCEPT");
         printSupport(channel, SelectionKey.OP_READ, "OP_READ");
         printSupport(channel, SelectionKey.OP_CONNECT, "OP_CONNECT");
@@ -84,7 +72,7 @@ public class SelectorTest {
     }
 
     @Test
-    public void socketChannelTest() throws IOException {
+    public void printSocketChannelValidOps() throws IOException {
         SocketChannel channel = SocketChannel.open();
         printSupport(channel, SelectionKey.OP_ACCEPT, "OP_ACCEPT");
         printSupport(channel, SelectionKey.OP_READ, "OP_READ");
