@@ -28,13 +28,11 @@ public class SelectorTest {
         channel.register(selector, SelectionKey.OP_READ);
     }
 
-    @Test(expected = CancelledKeyException.class)
-    public void CancelledKeyException() throws IOException {
+    @Test(expected = ClosedChannelException.class)
+    public void ClosedChannelException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
-        SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
-        key.cancel();
-        selector.selectNow();
+        channel.close();
         channel.register(selector, SelectionKey.OP_WRITE);
     }
 
@@ -42,15 +40,19 @@ public class SelectorTest {
     public void ClosedSelectorException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
+        Selector selector = Selector.open();
         selector.close();
         channel.register(selector, SelectionKey.OP_READ);
     }
 
-    @Test(expected = ClosedChannelException.class)
-    public void ClosedChannelException() throws IOException {
+    @Test(expected = CancelledKeyException.class)
+    public void CancelledKeyException() throws IOException {
         DatagramChannel channel = DatagramChannel.open();
         channel.configureBlocking(false);
-        channel.close();
+        SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
+        key.cancel();
+        Selector selector = Selector.open();
+        selector.selectNow();
         channel.register(selector, SelectionKey.OP_WRITE);
     }
     @Test
