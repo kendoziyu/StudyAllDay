@@ -1,4 +1,4 @@
-package org.coderead.netty.nio.channel.tcp;
+package org.coderead.netty.nio.channel.selector;
 
 import org.junit.Before;
 import org.junit.Test;
