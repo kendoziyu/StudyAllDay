@@ -12,10 +12,15 @@ public class SelectTest {
 
     @Test
     public void register() throws IOException {
-        DatagramChannel channel = DatagramChannel.open();
-        channel.configureBlocking(false);
-        Selector sel = Selector.open();
-        channel.register(sel, SelectionKey.OP_READ);
-        channel.register(sel, SelectionKey.OP_WRITE);
+        DatagramChannel channel1 = DatagramChannel.open();
+        DatagramChannel channel2 = DatagramChannel.open();
+        channel1.configureBlocking(false);
+        channel2.configureBlocking(false);
+        Selector sel1 = Selector.open();
+        Selector sel2 = Selector.open();
+        channel1.register(sel1, SelectionKey.OP_READ);
+        channel1.register(sel2, SelectionKey.OP_WRITE);
+        channel2.register(sel1, SelectionKey.OP_READ);
+        System.out.println();
     }
 }
