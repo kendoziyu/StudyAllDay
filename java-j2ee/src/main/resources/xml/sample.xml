@@ -1,0 +1,20 @@
+<configuration>
+    <title>
+        <font>
+            <name>Helvetica</name>
+            <size>36</size>
+        </font>
+    </title>
+    <body>
+        <content>酷炫的图片</content>
+        <image>
+            <url>http://pic1.win4000.com/wallpaper/2018-01-30/5a70007549b96.jpg</url>
+        </image>
+        <image>
+            <url>http://pic1.win4000.com/wallpaper/2018-01-30/5a70007549b96.jpg</url>
+        </image>
+        <image>
+            <url>http://pic1.win4000.com/wallpaper/2018-01-30/5a70007549b96.jpg</url>
+        </image>
+    </body>
+</configuration>
