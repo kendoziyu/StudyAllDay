@@ -32,7 +32,12 @@ public class TcpSocketServer {
             Thread.sleep(200);
             // 服务器向客户端回写数据
             out.write(String.valueOf(System.currentTimeMillis()).getBytes());
+            // 结尾回写回车+换行
+            out.write("\r\n".getBytes());
+            // 手动刷新输出流
+            out.flush();
         }
+        // 关闭连接
         clientSocket.close();
         serverSocket.close();
     }
