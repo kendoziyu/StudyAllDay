@@ -26,7 +26,7 @@ public class TcpSocketClient {
         OutputStream outStream = socket.getOutputStream();
         InputStream inStream = socket.getInputStream();
         // 用 PrintWriter 装饰输出流
-        PrintWriter out = new PrintWriter(outStream);
+        PrintWriter out = new PrintWriter(outStream, true /*autoFlush*/);
         // 用 Scanner 装饰输入流
         Scanner in = new Scanner(inStream);
         Scanner console = new Scanner(System.in);
@@ -35,8 +35,8 @@ public class TcpSocketClient {
         // 阻塞，等待控制台输入数据
         while (console.hasNextLine()) {
             // 将输入台数据传输给服务器
+            out.println(console.nextLine());
             sendTime = System.currentTimeMillis();
-            out.write(console.nextLine());
             // 阻塞，等待读取服务器回写数据
             while (in.hasNextLine()) {
                 returnTime = System.currentTimeMillis();
@@ -46,9 +46,7 @@ public class TcpSocketClient {
             }
         }
         console.close();
-        System.out.println("客户端套接字是否已经关闭？" + socket.isClosed());
         in.close();
-        System.out.println("客户端套接字是否已经关闭？" + socket.isClosed());
         out.close();
     }
 }
