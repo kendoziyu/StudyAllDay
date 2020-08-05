@@ -11,7 +11,7 @@ public class SocketServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(new InetSocketAddress(8080), 2);
+        serverSocket.bind(new InetSocketAddress(8080), 1);
         int acceptCount = 0;
         while (true) {
             Socket clientSocket = serverSocket.accept();
