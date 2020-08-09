@@ -4,24 +4,23 @@ package org.coderead.netty.nio.channel.tcp;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
+import java.util.Iterator;
 
 public class TcpServer {
 
     public static void main(String[] args) {
         try {
-            // 1. 打开管道
             ServerSocketChannel channel = ServerSocketChannel.open();
-            // 2. 绑定端口
+            // 坑：如果不设置非阻塞，还是阻塞式模型
+            channel.configureBlocking(false);
             channel.bind(new InetSocketAddress(8081));
-            while (true) {
-                // 3. 等待连接
-                SocketChannel socketChannel = channel.accept();
-                System.out.println("建立一个新的连接");
-                // BIO 模型，交给线程去处理
-                new Thread(new SocketChannelHandler(socketChannel)).start();
-            }
+
+            Selector selector = Selector.open();
+            channel.register(selector, SelectionKey.OP_ACCEPT);
+
+            new Thread(new SelectorIO(selector), "Selector-IO").start();
+            System.in.read(); // 阻塞主线程
         } catch (IOException ex) {
             System.out.println("TcpServer " + ex);
         }
