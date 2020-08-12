@@ -10,11 +10,12 @@ import java.net.Socket;
  */
 public class SyncClients {
 
-    private static Socket[] clients = new Socket[5];
+    private static Socket[] clients = new Socket[100];
     public static void main(String[] args) throws Exception {
         for (int i = 1; i <= clients.length; i++) {
             clients[i-1] = new Socket("127.0.0.1", 8080);
             System.out.println("client connection:" + i);
         }
+        System.in.read();
     }
 }
