@@ -18,7 +18,13 @@ public class HttpServer {
     private final Selector selector;
     private final HttpServlet servlet;
     ExecutorService service;
-    // 初始化
+
+    /**
+     * 初始化
+     * @param port
+     * @param servlet
+     * @throws IOException
+     */
     public HttpServer(int port, HttpServlet servlet) throws IOException {
         this.port = port;
         this.servlet = servlet;
@@ -30,6 +36,9 @@ public class HttpServer {
         channel.register(selector, SelectionKey.OP_ACCEPT);
     }
 
+    /**
+     * 启动
+     */
     public void start() {
         new Thread(new Runnable() {
             @Override
@@ -43,6 +52,7 @@ public class HttpServer {
             }
         }, "Selector-IO").start();
     }
+
     public static void main(String[] args) throws IOException {
         try {
             HttpServer server = new HttpServer(80, new HttpServlet());
@@ -55,6 +65,11 @@ public class HttpServer {
         System.in.read();
     }
 
+    /**
+     * 轮询键集
+     * @param selector
+     * @throws IOException
+     */
     private void poll(Selector selector) throws IOException {
         while (true) {
             selector.select();
@@ -107,6 +122,12 @@ public class HttpServer {
 
     }
 
+    /**
+     * 从缓冲区读取数据并写入 {@link ByteArrayOutputStream}
+     * @param socketChannel
+     * @param out
+     * @throws IOException
+     */
     private void read(SocketChannel socketChannel, ByteArrayOutputStream out) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         while (socketChannel.read(buffer) > 0) {
@@ -116,6 +137,11 @@ public class HttpServer {
         }
     }
 
+    /**
+     * 解码 Http 请求报文
+     * @param array
+     * @return
+     */
     private HttpRequest decode(byte[] array) {
         try {
             HttpRequest request = new HttpRequest();
@@ -173,6 +199,11 @@ public class HttpServer {
         key.attach(null);
     }
 
+    /**
+     * http 响应报文编码
+     * @param response
+     * @return
+     */
     private byte[] encode(HttpResponse response) {
         StringBuilder builder = new StringBuilder();
         if (response.code == 0) {
